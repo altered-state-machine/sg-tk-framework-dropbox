@@ -13,17 +13,18 @@ Hook that provides upload and download functionality for the cloud storage provi
 """
 import os
 import sgtk
+import dropbox
+from dropbox.files import WriteMode
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
 
-class TemplateProvider(HookBaseClass):
-
+class DropboxProvider(HookBaseClass):
     """
-    This hooks is just an template hook that doesn't actually implement any upload or download behaviour.
+    This hook is just a template hook that doesn't actually implement any upload or download behaviour.
     """
 
-    def upload(self, published_file):
+    def upload(self, published_file, dbx, namespace):
         """
         This method should contain any logic for uploading the file to the remote storage.
         Its recommended that when you upload the file you prefix the file name with the id
@@ -32,9 +33,24 @@ class TemplateProvider(HookBaseClass):
         :param published_file: dict PublishedFile entity.
         :return: str path to uploaded file, None if it fails.
         """
-        return
 
-    def download(self, published_file):
+        # For dropbox, the namespace already points at the Project's path, so there is no need to carry the
+        # Project_name in our remote_path variable, it should be stripped. Dropbox requires all paths to start with
+        # the `/`, so we ensure that requirement is satisfied
+        remote_path = published_file["path_cache"]
+        remote_path = remote_path.replace(namespace.name, "")
+        if not remote_path.startswith("/"):
+            remote_path = "/" + remote_path
+
+        with open(published_file['path']['local_path'], 'rb') as f:
+            dbx.with_path_root(
+                dropbox.common.PathRoot.namespace_id(namespace.namespace_id)).files_upload(f.read(),
+                                                                                           remote_path,
+                                                                                           mode=WriteMode(
+                                                                                               'overwrite'))
+        return remote_path
+
+    def download(self, published_file, dbx):
         """
         Downloads the PublishedFile from the remote storage.
         This method is responsible for finding the file in the remote storage based on

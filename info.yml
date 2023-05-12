@@ -12,17 +12,43 @@
 
 # expected fields in the configuration file for this engine
 configuration:
-  provider_hook:
+  app_key:
+    type: str
+    description: "The special KEY registered on Dropbox to identify the App"
+  app_secret:
+    type: str
+    description: "The special Secret value registered on Dropbox to identify the App"
+  app_home:
+    type: str
+    description: "The root path for current project on remote storage"
+    default_value: ""
+  app_token:
+    type: str
+    description: "An access token with expiry to provide alternative means of authentication"
+    default_value: ""
+  hook_provider:
     type: hook
     description: Hook for implementing the cloud storage provider's upload and download logic.
-    default_value: '{self}/template_provider_hook.py'
+    default_value: '{self}/hook_dropbox.py'
+  hook_get_dropbox_user_profile:
+    type: hook
+    description: Hook for implementing the process of fetching Dropbox user
+    parameters: [dbx_team_api, sg_user]
+    default_value: '{self}/hook_get_dropbox_user_profile.py'
+  hook_get_dropbox_project_namespace:
+    type: hook
+    description: Hook for implementing the process of fetching Dropbox project namespace
+    parameters: [ dbx_team_api ]
+    default_value: '{self}/hook_get_dropbox_project_namespace.py'
+
+
 
 # the Shotgun fields that this engine needs in order to operate correctly
 requires_shotgun_fields:
 
 # More verbose description of this item
-display_name: "Remote Storage Framework"
-description: "Framework that handles uploading and downloading files from a cloud storage provider"
+display_name: "Dropbox Storage Framework"
+description: "Framework that handles uploading and downloading files from Dropbox"
 
 # Required minimum versions for this item to run
 requires_shotgun_version:
