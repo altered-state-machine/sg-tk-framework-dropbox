@@ -15,9 +15,6 @@ configuration:
   app_key:
     type: str
     description: "The special KEY registered on Dropbox to identify the App"
-  app_secret:
-    type: str
-    description: "The special Secret value registered on Dropbox to identify the App"
   app_home:
     type: str
     description: "The root path for current project on remote storage"

@@ -28,6 +28,7 @@ class DropboxStorageFramework(sgtk.platform.Framework):
         self.__init_dropbox_sdk()
 
         self.connection = self.import_module("connection")
+        self.auth = self.import_module("auth")
 
     def upload_publish(self, published_file):
         """
@@ -95,8 +96,7 @@ class DropboxStorageFramework(sgtk.platform.Framework):
                         "hook_provider",
                         "download",
                         published_file=published_file,
-                        cloud_root_directory=self.cloud_root_directory,
-                        dbx=dbx,
+
                     )
                 )
         finally:
