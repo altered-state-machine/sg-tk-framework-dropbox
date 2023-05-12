@@ -57,7 +57,7 @@ class MayaActions(HookBaseClass):
             # file already exists locally
             return path
 
-        remote_storage = self.load_framework("tk-framework-remotestorage_v1.x.x")
+        remote_storage = self.load_framework("tk-framework-dropbox_v1.x.x")
         downloaded_file = remote_storage.download_publish(published_file)
 
         if downloaded_file is None:

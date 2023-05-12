@@ -28,7 +28,7 @@ class PostPhaseHook(HookBaseClass):
     # defined here: https://developer.shotgunsoftware.com/tk-multi-publish2/
 
     def post_finalize(self, publish_tree):
-        remote_storage = self.load_framework("tk-framework-remotestorage_v1.x.x")
+        remote_storage = self.load_framework("tk-framework-dropbox_v1.x.x")
 
         # loop over all items and try and extract out the sg_publish_data if we can.
         # TODO: check that publishes with the same path have same id
