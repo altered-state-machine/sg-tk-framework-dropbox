@@ -10,6 +10,7 @@
 
 from tank.platform.qt import QtCore, QtGui
 
+
 class Ui_AcknowledgeForm(object):
     def setupUi(self, TrustForm):
         if not TrustForm.objectName():
@@ -36,7 +37,6 @@ class Ui_AcknowledgeForm(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer)
 
-
         self.horizontalLayout.addLayout(self.verticalLayout_2)
 
         self.verticalLayout = QtGui.QVBoxLayout()
@@ -49,7 +49,6 @@ class Ui_AcknowledgeForm(object):
         self.msg_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
 
         self.verticalLayout.addWidget(self.msg_label)
-
 
         self.horizontalLayout.addLayout(self.verticalLayout)
 
@@ -87,7 +86,6 @@ class Ui_AcknowledgeForm(object):
 
         self.horizontalLayout_3.addWidget(self.ok_btn)
 
-
         self.verticalLayout_3.addLayout(self.horizontalLayout_3)
 
         self.verticalLayout_3.setStretch(1, 1)
@@ -96,14 +94,16 @@ class Ui_AcknowledgeForm(object):
 
         self.ok_btn.setDefault(True)
 
-
         QtCore.QMetaObject.connectSlotsByName(TrustForm)
+
     # setupUi
 
     def retranslateUi(self, TrustForm):
         TrustForm.setWindowTitle(QtCore.QCoreApplication.translate("TrustForm", u"Form", None))
         self.warning_label.setText("")
-        self.msg_label.setText(QtCore.QCoreApplication.translate("TrustForm", u"<html><head/><body><p><span style=\" font-weight:600;\">A New Token is required to publish files to cloud storage.</span></p><p>Previously issued access token has expiered or this is the first time request.</p><p>This application requires access to Dropbox on behalf of the <span style=\" font-weight:600;\">&lt;user.name&gt;</span></p><p>When you continue, a new Web Browser window will be open with instructions.</p></body></html>", None))
+        self.msg_label.setText(QtCore.QCoreApplication.translate("TrustForm",
+                                                                 u"<html><head/><body><p><span style=\" font-weight:600;\">A New Token is required to publish files to cloud storage.</span></p><p>Previously issued access token has expiered or this is the first time request.</p><p>This application requires access to Dropbox on behalf of the <span style=\" font-weight:600;\">&lt;user.name&gt;</span></p><p>When you continue, a new Web Browser window will be open with instructions.</p></body></html>",
+                                                                 None))
         self.cancel_btn.setText(QtCore.QCoreApplication.translate("TrustForm", u"Cancel", None))
         self.ok_btn.setText(QtCore.QCoreApplication.translate("TrustForm", u"Continue", None))
     # retranslateUi

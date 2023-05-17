@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PasswordForm</class>
- <widget class="QWidget" name="PasswordForm">
+ <class>TokenForm</class>
+ <widget class="QWidget" name="TokenForm">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -60,7 +60,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="password_edit">
+      <widget class="QLineEdit" name="token_edit">
        <property name="minimumSize">
         <size>
          <width>0</width>

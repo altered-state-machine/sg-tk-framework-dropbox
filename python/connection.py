@@ -15,6 +15,7 @@ class ConnectionHandler:
         """
         self._fw = fw
         self._team_api = None
+        self._retry = 2
 
     def connect_to_dropbox(self, token):
         if hasattr(self, "_team_api") and hasattr(self, "_user_api"):
@@ -23,8 +24,8 @@ class ConnectionHandler:
         # Access token can expire,
         # TODO: Add logic that will check expiry and refresh token when needed.
         # Currently, just get new token by hand
-
-        team_api = dropbox.DropboxTeam(oauth2_access_token=token)
+        key = self._fw.get_setting("app_key")
+        team_api = dropbox.DropboxTeam(oauth2_refresh_token=token, app_key=key)
 
         sg_user = sgtk.util.get_current_user(self._fw.sgtk)
         dbx_profile = self._fw.execute_hook("hook_get_dropbox_user_profile", dbx_team_api=team_api, sg_user=sg_user)
@@ -37,26 +38,35 @@ class ConnectionHandler:
 
     def connect(self, token):
         global _g_connection_lock
-        _g_connection_lock.acquire()
-        try:
-            self.connect_to_dropbox(token)
+        while self._retry >= 0:
+            _g_connection_lock.acquire()
             try:
-                self._fw.log_metric("Connected")
-            except:
-                # ignore all errors. ex: using a core that doesn't support metrics
-                pass
-
-            return self._team_api, self._user_api
-        except Exception as e:
-            self._fw.logger.debug(e)
-            raise
-        finally:
-            _g_connection_lock.release()
+                self.connect_to_dropbox(token)
+            except dropbox.exceptions.AuthError as e:
+                self._fw.logger.debug(e)
+                self._retry -= 1
+                token = get_new_token()
+                self.connect_to_dropbox(token)
+            except Exception as e:
+                self._fw.logger.debug(e)
+                raise
+            finally:
+                _g_connection_lock.release()
+                break
+        else:
+            self._fw.logger.error("Cannot connect to cloud storage")
+        return self._team_api, self._user_api
 
 
 def get_token():
     from . import auth
+    token = auth.login()
+    return token
 
+
+def get_new_token():
+    from . import auth
+    auth.clear_cache()
     token = auth.login()
     return token
 

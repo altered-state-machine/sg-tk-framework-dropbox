@@ -1,11 +1,10 @@
 import sgtk
 from sgtk.platform.qt import QtCore, QtGui
-from .ui.acknowledge_form import Ui_AcknowledgeForm
+from .ui.allowance_token_form import Ui_TokenForm
 
 
-class AcknowledgeFormWidget(QtGui.QWidget):
-
-    ack_accepted = QtCore.Signal(QtGui.QWidget)
+class AuthCodeFormWidget(QtGui.QWidget):
+    auth_code_entered = QtCore.Signal(QtGui.QWidget)
 
     def __init__(self, setup_proc=None, parent=None):
         """
@@ -16,7 +15,7 @@ class AcknowledgeFormWidget(QtGui.QWidget):
         QtGui.QWidget.__init__(self, parent)
 
         # set up the UI
-        self.ui = Ui_AcknowledgeForm()
+        self.ui = Ui_TokenForm()
         self.ui.setupUi(self)
 
         # hook up the UI:
@@ -26,9 +25,12 @@ class AcknowledgeFormWidget(QtGui.QWidget):
         if setup_proc:
             setup_proc(self)
 
+    def auth_code(self):
+        return str(self.ui.token_edit.text())
+
     def _on_ok(self):
         self._exit_code = QtGui.QDialog.Accepted
-        self.ack_accepted.emit(self)
+        self.auth_code_entered.emit(self)
         self._exit_code = QtGui.QDialog.Rejected
         self.close()
 
