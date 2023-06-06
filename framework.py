@@ -9,13 +9,27 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 """
-A framework that handles uploading and downloading of files from a cloud storage provider.
+A framework that handles uploading and downloading of files from a Dropbox storage provider.
 """
+import os
+import sys
 
 import sgtk
 
 
-class RemoteStorageFramework(sgtk.platform.Framework):
+class DropboxStorageFramework(sgtk.platform.Framework):
+    def init_framework(self):
+        """
+        Construction
+        """
+        self.log_debug("%s: Initializing..." % self)
+
+        # initialize dropbox sdk:
+        self.__init_dropbox_sdk()
+
+        self.connection = self.import_module("connection")
+        self.auth = self.import_module("auth")
+
     def upload_publish(self, published_file):
         """
         Uploads a PublishedFile's path to the remote storage.
@@ -31,6 +45,9 @@ class RemoteStorageFramework(sgtk.platform.Framework):
         :param published_files: list of dicts
         :return: list of strings to the uploaded files
         """
+
+        team_api, user_api = self.connection.connect()
+
         uploaded_files = []
         try:
             for published_file in published_files:
@@ -40,7 +57,11 @@ class RemoteStorageFramework(sgtk.platform.Framework):
                 self.logger.debug("Executing upload hook for %s" % published_file)
                 uploaded_files.append(
                     self.execute_hook_method(
-                        "provider_hook", "upload", published_file=published_file
+                        "hook_provider",
+                        "upload",
+                        published_file=published_file,
+                        dbx=user_api,
+                        namespace=self.get_dropbox_project_namespace(team_api)
                     )
                 )
         finally:
@@ -62,19 +83,59 @@ class RemoteStorageFramework(sgtk.platform.Framework):
         :param published_files: list of dicts
         :return: list of strings of paths to the downloaded files.
         """
+
+        team_api, user_api = self.connection.connect()
+
         downloaded_files = []
         try:
             for published_file in published_files:
                 self.engine.show_busy(
                     "Download",
-                    "Retrieving from remote: %s ..." % published_file["code"],
+                    "Retrieving from remote...",
                 )
                 self.logger.debug("Executing download hook for %s" % published_file)
                 downloaded_files.append(
                     self.execute_hook_method(
-                        "provider_hook", "download", published_file=published_file
+                        "hook_provider",
+                        "download",
+                        published_file=published_file,
+                        dbx=user_api,
+                        namespace=self.get_dropbox_project_namespace(team_api)
                     )
                 )
         finally:
             self.engine.clear_busy()
         return downloaded_files
+
+    def get_dropbox_user(self, dbx_team_api, sg_user):
+        """
+        Return the Dropbox user associated with the specified Shotgun user
+        """
+        dropbox_user = self.execute_hook("hook_get_dropbox_user_profile", sg_user=sg_user)
+        return dropbox_user
+
+    def get_dropbox_project_namespace(self, dbx_team_api):
+        project_namespace = self.execute_hook("hook_get_dropbox_project_namespace",
+                                              dbx_team_api=dbx_team_api,
+                                              )
+        return project_namespace
+
+    # private methods
+    def __init_dropbox_sdk(self):
+        """
+        Make sure that dropbox sdk is available and if it's not then add it to the path if
+        we have a version we can use.
+        """
+        # before-app-launch hook currently handles this step.
+        sdk_path = os.path.join(self.disk_location, "resources")
+        if sdk_path not in sys.path:
+            sys.path.append(sdk_path)
+        try:
+            from dropbox import Dropbox
+        except Exception as e:
+            self.log_error(e)
+            self.log_error("Failed to load dropbox sdk!")
+        else:
+            # Dropbox sdk already available!
+            self.log_debug("Dropbox sdk successfully loaded!")
+            return

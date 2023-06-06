@@ -1,25 +1,21 @@
-# tk-framework-remotestorageexample
+# tk-framework-dropbox
 
-This is an example of a Toolkit Framework that could be used to provide an interface for uploading and downloading files to and from a cloud storage solution.
-
-**Note:** This was written as an example, and will not be maintained/supported by ShotGrid Software.
-
-Actual upload and download functionality is not implemented by default, it is up to you to add it.
+This is a Dropbox Toolkit framework that provides basic uploading and downloading files to and from a cloud storage solution.
 
 ## Usage
 
 The framework contains a simple API interface for uploading and downloading files.
 Once the framework has been added to your config, you can import it within your hooks.
-Assuming you defined your framework instance name as `tk-framework-remotestorage_v1.x.x`, you can import it as follows:
+Assuming you defined your framework instance name as `tk-framework-dropbox_v1.x.x`, you can import it as follows:
 
 ```python
-remote_storage = self.load_framework("tk-framework-remotestorage_v1.x.x")
+remote_storage = self.load_framework("tk-framework-dropbox_v1.x.x")
 ```
 
 The framework has two public methods that can be called:
 
 #### `upload_publish(published_file)`
-This expects a ShotGrid `PublishedFile` entity dictionary, and will upload the file path associated with that entity to the configured storage (which is implemented via the hooks).
+This expects a ShotGrid `PublishedFile` entity dictionary, and will upload the file path associated with that entity to dropbox.
 It returns a `str` path to the uploaded file.
 
 #### `upload_publishes(published_files)`
@@ -38,4 +34,4 @@ This returns a list of paths to the downloaded files.
 
 ## Configuration
 
-The actual upload and download functionality is not implemented by default and it is up to you to take over the `provider_hook` and implement the `upload()` and `download()` methods.
+Framework provides default `upload()` and `download()` methods functionality via `hook_provider`, up to you to take over the hook and override its generic behaviour.
