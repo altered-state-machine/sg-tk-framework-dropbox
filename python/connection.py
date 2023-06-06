@@ -21,9 +21,6 @@ class ConnectionHandler:
         if hasattr(self, "_team_api") and hasattr(self, "_user_api"):
             if self._team_api is not None and self._user_api is not None:
                 return self._team_api, self._user_api
-        # Access token can expire,
-        # TODO: Add logic that will check expiry and refresh token when needed.
-        # Currently, just get new token by hand
         key = self._fw.get_setting("app_key")
         team_api = dropbox.DropboxTeam(oauth2_refresh_token=token, app_key=key)
 

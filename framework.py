@@ -83,12 +83,15 @@ class DropboxStorageFramework(sgtk.platform.Framework):
         :param published_files: list of dicts
         :return: list of strings of paths to the downloaded files.
         """
+
+        team_api, user_api = self.connection.connect()
+
         downloaded_files = []
         try:
             for published_file in published_files:
                 self.engine.show_busy(
                     "Download",
-                    "Retrieving from remote: %s ..." % published_file["code"],
+                    "Retrieving from remote...",
                 )
                 self.logger.debug("Executing download hook for %s" % published_file)
                 downloaded_files.append(
@@ -96,7 +99,8 @@ class DropboxStorageFramework(sgtk.platform.Framework):
                         "hook_provider",
                         "download",
                         published_file=published_file,
-
+                        dbx=user_api,
+                        namespace=self.get_dropbox_project_namespace(team_api)
                     )
                 )
         finally:

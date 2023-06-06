@@ -50,7 +50,7 @@ class DropboxProvider(HookBaseClass):
                                                                                                'overwrite'))
         return remote_path
 
-    def download(self, published_file, dbx):
+    def download(self, published_file, dbx, namespace):
         """
         Downloads the PublishedFile from the remote storage.
         This method is responsible for finding the file in the remote storage based on
@@ -58,4 +58,11 @@ class DropboxProvider(HookBaseClass):
         :param published_file: dict, PublishedFile entity.
         :return: str; The path to the downloaded file.
         """
-        return
+        local_path = published_file['path']['local_path']
+        sgtk.util.filesystem.ensure_folder_exists(os.path.dirname(local_path))
+
+        dbx_path = local_path.replace(self.sgtk.project_path, "").replace("\\", "/")
+        dbx.with_path_root(
+            dropbox.common.PathRoot.namespace_id(namespace.namespace_id)).files_download_to_file(local_path, dbx_path)
+
+        return local_path
